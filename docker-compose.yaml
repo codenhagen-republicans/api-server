@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:alpine
+
+    volumes:
+      - type: bind
+        source: ./db
+        target: /docker-entrypoint-initdb.d/
