@@ -4,7 +4,20 @@ services:
   db:
     image: postgres:alpine
 
+    ports:
+      - target: 5432
+        published: 5432
+        protocol: tcp
+        mode: host
+
     volumes:
       - type: bind
         source: ./db
         target: /docker-entrypoint-initdb.d/
+
+      - type: volume
+        source: mydata
+        target: /var/lib/postgresql/data
+
+volumes:
+  mydata:
