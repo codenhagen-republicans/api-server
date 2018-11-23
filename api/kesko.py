@@ -9,7 +9,7 @@ def ingredient(overall_weight, raw_ingredient):
     if m is None:
         return None
 
-    name = m.group(1)
+    name = m.group(1).lower()
     percentage = float(m.group(2).replace(',', '.'))
 
     return (

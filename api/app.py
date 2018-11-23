@@ -38,10 +38,27 @@ def hello_world():
     db.session.commit()
     return str(food.name)
 
+def compute_footprint(foods, ingredients):
+    total_footprint = 0
+
+    for ingredient in ingredients:
+        for food in foods:
+            if food.name == ingredient["name"]:
+                footprint = food.co2_impresion * ingredient["weight"]
+                total_footprint += footprint
+                ingredient["footprint"] = footprint
+
+    return total_footprint
+
 @app.route('/footprint', methods=['GET'])
 def footprint():
     ean = request.args.get("ean")
     products = kesko.kesko(ean)
+
+    for product in products:
+        ingredient_names = (ingredient["name"] for ingredient in product["ingredients"])
+        foods = db.session.query(Food).filter(Food.name.in_(ingredient_names)).all()
+        product["footprint"] = compute_footprint(foods, product["ingredients"])
 
     return json.dumps(products, ensure_ascii=False).encode("utf8")
 
