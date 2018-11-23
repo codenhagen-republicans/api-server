@@ -1,6 +1,14 @@
 name,co2_impresion,co2_transport_import
-Tomat, 0.8,null
-Lög, 0.4,null
-Grön paprika, 0.7,null
-Salt, 0,null
-Tomatpuré, 0.8, null
+tomat,0.8,null
+lög,0.4,null
+grönpaprika,0.7,null
+salt,0,null
+tomatpuré,0.8,null
+nötkött,13.9,null
+svinkött,4.6,null
+kycklingkött,5.5,null
+fårkött,21.4,null
+gurka,0.8,null
+potatis,0.2,null
+vit choklad,2.7,null
+mörk choklad,0.9,null
