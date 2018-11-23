@@ -6,10 +6,11 @@ from flask import request
 from flask_sqlalchemy import SQLAlchemy
 import kesko
 import json
+import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://green_api:green_api@localhost/green_api'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URL"]
 db = SQLAlchemy(app)
 
 class Test(db.Model):
