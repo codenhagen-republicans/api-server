@@ -19,5 +19,9 @@ services:
       #   source: mydata
       #   target: /var/lib/postgresql/data
 
+  db-client:
+    image: postgres:alpine
+    command: ["psql", "-h", "db", "-U", "postgres"]
+
 volumes:
   mydata:
