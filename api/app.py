@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask
+from flask import request
 from flask_sqlalchemy import SQLAlchemy
+import kesko
+import json
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -35,5 +38,11 @@ def hello_world():
     db.session.commit()
     return str(food.name)
 
+@app.route('/footprint', methods=['GET'])
+def footprint():
+    ean = request.args.get("ean")
+    products = kesko.kesko(ean)
+
+    return json.dumps(products, ensure_ascii=False).encode("utf8")
 
 app.run(debug=True)
