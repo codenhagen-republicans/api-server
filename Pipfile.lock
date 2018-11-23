@@ -75,7 +75,7 @@
         },
         "markupsafe": {
             "hashes": [
-                "sha256:d9ac82be533394d341b41d78aca7ed0e0f4ba5a2231602e2f05aa87f25c51672"
+                "sha256:83381342bfc22b3c8c06f2dd93a505413888694302de25add756254beee8449c"
             ],
             "version": "==1.1.0"
         },
