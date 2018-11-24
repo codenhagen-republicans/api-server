@@ -32,7 +32,10 @@ INSERT INTO food (id,name,co2_impresion,co2_transport_import)
   (DEFAULT,'gurka',0.8,null),
   (DEFAULT,'potatis',0.2,null),
   (DEFAULT,'vit choklad',2.7,null),
-  (DEFAULT,'mörk choklad',0.9,null);
+  (DEFAULT,'mörk choklad',0.9,null),
+  (DEFAULT,'sokeri',1.0,null),
+  (DEFAULT,'frukt fiber',0.9,null),
+  (DEFAULT,'äggvita',2.0,null);
 
 create table footprint (
   id serial primary key,
