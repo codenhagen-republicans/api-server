@@ -1,9 +1,13 @@
 #!/usr/bin/env python3.7
 # -*- coding: utf-8 -*-
 
-from flask import Flask
-from flask import request
+from flask import Flask, Response, request
 from flask_sqlalchemy import SQLAlchemy
+from flask_admin import Admin
+from flask_admin.contrib import sqla
+from flask_basicauth import BasicAuth
+from werkzeug.exceptions import HTTPException
+
 import kesko
 import json
 import os
@@ -12,6 +16,29 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URL"]
 db = SQLAlchemy(app)
+
+app.config['BASIC_AUTH_USERNAME'] = "admin"
+app.config['BASIC_AUTH_PASSWORD'] = os.environ["BASIC_AUTH_PASSWORD"]
+admin = Admin(app)
+basic_auth = BasicAuth(app)
+
+
+class AuthException(HTTPException):
+    def __init__(self, message):
+        super().__init__(message, Response(
+            "You could not be authenticated. Please refresh the page.", 401,
+            {'WWW-Authenticate': 'Basic realm="Login Required"'}
+        ))
+
+class ModelView(sqla.ModelView):
+    def is_accessible(self):
+        if not basic_auth.authenticate():
+            raise AuthException('Not authenticated.')
+        else:
+            return True
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(basic_auth.challenge())
 
 class Test(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -79,6 +106,9 @@ def footprint():
         product["footprint"] = footprint[0].co2
 
     return json.dumps(product, ensure_ascii=False).encode("utf8")
+
+admin.add_view(ModelView(Food, db.session))
+admin.add_view(ModelView(Footprint, db.session))
 
 port = int(os.environ.get('PORT', 5000))
 app.run(host='0.0.0.0', port=port, debug=True)

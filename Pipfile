@@ -8,6 +8,9 @@ flask-sqlalchemy = "*"
 psycopg2 = "*"
 requests = "*"
 gunicorn = "*"
+flask-admin = "*"
+flask-basicauth = "*"
+flask-dotenv = "*"
 
 [dev-packages]
 
