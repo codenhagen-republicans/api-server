@@ -10,23 +10,7 @@ create database green_api
 grant all on database green_api to green_api;
 
 \connect green_api green_api;
-
-create table test (
-    id              bigserial    primary key,
-    other_thing     text
-);
-
-drop table if exists food;
-
-create table food_raw (
-  name text,
-  co2_impresion text not null,
-  co2_transport_import text default null
-);
-
-COPY food_raw from '/docker-entrypoint-initdb.d/dummy_co2.csv'
-  DELIMITER ',' CSV HEADER QUOTE '"';
-
+ 
 create table food (
   id serial primary key,
   name text,
@@ -34,16 +18,29 @@ create table food (
   co2_transport_import numeric default null
 );
 
-insert into food (
-  name,
-  co2_impresion,
-  co2_transport_import
-)
-select
-  name,
-  cast(co2_impresion as float),
-  case
-    when co2_transport_import = 'null'
-      then null
-    else cast(co2_transport_import as float) end
-from food_raw;
+INSERT INTO food (id,name,co2_impresion,co2_transport_import)
+  VALUES
+  (DEFAULT,'tomat',0.8,null),
+  (DEFAULT,'lök',0.4,null),
+  (DEFAULT,'grön paprika',0.7,null),
+  (DEFAULT,'salt',0,null),
+  (DEFAULT,'tomatpuré',0.8,null),
+  (DEFAULT,'nötkött',13.9,null),
+  (DEFAULT,'svinkött',4.6,null),
+  (DEFAULT,'kycklingkött',5.5,null),
+  (DEFAULT,'fårkött',21.4,null),
+  (DEFAULT,'gurka',0.8,null),
+  (DEFAULT,'potatis',0.2,null),
+  (DEFAULT,'vit choklad',2.7,null),
+  (DEFAULT,'mörk choklad',0.9,null);
+
+create table footprint (
+  id serial primary key,
+  ean text,
+  co2 numeric not null
+);
+
+INSERT INTO footprint (id,ean,co2)
+  VALUES
+  (DEFAULT,'6410405175724',0.54),
+  (DEFAULT,'6410405175687',0.18);
