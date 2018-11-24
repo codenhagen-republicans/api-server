@@ -83,21 +83,10 @@ def footprint_ingredients(foods, ingredients):
         for ingredient in ingredients
         if food.name == ingredient["name"])
 
-@app.route('/footprint', methods=['GET'])
-def footprint():
-    ean = request.args.get("ean")
-    products = kesko.kesko(ean)
-
-    if products == []:
-        return "null"
-
-    product = products[0]
-
-    footprint = db.session.query(Footprint).filter(Footprint.ean == ean).all()
+def footprint_product(product):
+    footprint = db.session.query(Footprint).filter(Footprint.ean == product["ean"]).all()
 
     if footprint == []:
-        print("here")
-
         # If not present, compute the footprint from the ingredients
         ingredient_names = (ingredient["name"] for ingredient in product["ingredients"])
         foods = db.session.query(Food).filter(Food.name.in_(ingredient_names)).all()
@@ -105,7 +94,31 @@ def footprint():
     else:
         product["footprint"] = footprint[0].co2
 
-    return json.dumps(product, ensure_ascii=False).encode("utf8")
+@app.route('/footprint', methods=['GET'])
+def footprint():
+    ean = request.args.get("ean")
+    product = kesko.kesko_product(ean)
+
+    if product == None:
+        return "null"
+
+    # Products in the same segment
+    segment_products = list(map(kesko.product, kesko.kesko_segment(product["segment"]["id"])))
+
+    # Add footprint information
+    footprint_product(product)
+
+    for p in segment_products:
+        footprint_product(p)
+
+    recommendation = min(segment_products, key=lambda p: p["footprint"])
+
+    output = (
+        { "product" : product
+        , "recommendation" : recommendation
+        })
+
+    return json.dumps(output, ensure_ascii=False).encode("utf8")
 
 admin.add_view(ModelView(Food, db.session))
 admin.add_view(ModelView(Footprint, db.session))
