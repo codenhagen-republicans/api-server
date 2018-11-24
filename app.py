@@ -77,11 +77,16 @@ def hello_world():
     return str(food.name)
 
 def footprint_ingredients(foods, ingredients):
-    return sum(
-        food.co2_impresion * ingredient["weight"]
-        for food in foods
-        for ingredient in ingredients
-        if food.name == ingredient["name"])
+    total_footprint = 0
+
+    for food in foods:
+        for ingredient in ingredients:
+            if food.name == ingredient["name"]:
+                footprint = food.co2_impresion * ingredient["weight"]
+                total_footprint += footprint
+                ingredient["footprint"] = footprint
+
+    return total_footprint
 
 def footprint_product(product):
     footprint = db.session.query(Footprint).filter(Footprint.ean == product["ean"]).all()
