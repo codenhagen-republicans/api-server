@@ -3,6 +3,7 @@
 
 import requests
 import re
+import json
 
 def ingredient(overall_weight, raw_ingredient):
     m = re.match(r"(\w+)\s*\(?\s*(\d+[,.]?\d+)?\s*%\s*\)?\s*", raw_ingredient)
@@ -29,7 +30,8 @@ def product(json):
     weight = float(json["measurements"]["netWeight"])
 
     return (
-        { "image"       : json["pictureUrls"][0]["original"]
+        { "name"        : json["labelName"]
+        , "image"       : json["pictureUrls"][0]["original"]
         , "weight"      : weight
         , "ingredients" : ingredients(weight, raw_ingredients)
         })

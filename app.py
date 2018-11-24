@@ -24,12 +24,22 @@ class Food(db.Model):
     __tablename__ = 'food'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False)
+    name = db.Column(db.Text, nullable=False)
     co2_impresion = db.Column(db.Float(), nullable=False)
     co2_transport_import = db.Column(db.Float(), nullable=True)
 
     def __str__(self):
         return str(self.name)
+
+class Footprint(db.Model):
+    __tablename__ = 'footprint'
+
+    id = db.Column(db.Integer, primary_key=True)
+    ean = db.Column(db.Text, nullable=False)
+    co2 = db.Column(db.Float(), nullable=False)
+
+    def __str__(self):
+        return str(self.ean)
 
 @app.route('/')
 def hello_world():
@@ -39,29 +49,36 @@ def hello_world():
     db.session.commit()
     return str(food.name)
 
-def compute_footprint(foods, ingredients):
-    total_footprint = 0
-
-    for ingredient in ingredients:
-        for food in foods:
-            if food.name == ingredient["name"]:
-                footprint = food.co2_impresion * ingredient["weight"]
-                total_footprint += footprint
-                ingredient["footprint"] = footprint
-
-    return total_footprint
+def footprint_ingredients(foods, ingredients):
+    return sum(
+        food.co2_impresion * ingredient["weight"]
+        for food in foods
+        for ingredient in ingredients
+        if food.name == ingredient["name"])
 
 @app.route('/footprint', methods=['GET'])
 def footprint():
     ean = request.args.get("ean")
     products = kesko.kesko(ean)
 
-    for product in products:
+    if products == []:
+        return "null"
+
+    product = products[0]
+
+    footprint = db.session.query(Footprint).filter(Footprint.ean == ean).all()
+
+    if footprint == []:
+        print("here")
+
+        # If not present, compute the footprint from the ingredients
         ingredient_names = (ingredient["name"] for ingredient in product["ingredients"])
         foods = db.session.query(Food).filter(Food.name.in_(ingredient_names)).all()
-        product["footprint"] = compute_footprint(foods, product["ingredients"])
+        product["footprint"] = footprint_ingredients(foods, product["ingredients"])
+    else:
+        product["footprint"] = footprint[0].co2
 
-    return json.dumps(products, ensure_ascii=False).encode("utf8")
+    return json.dumps(product, ensure_ascii=False).encode("utf8")
 
 port = int(os.environ.get('PORT', 5000))
-app.run(host='0.0.0.0', port=port)
+app.run(host='0.0.0.0', port=port, debug=True)
