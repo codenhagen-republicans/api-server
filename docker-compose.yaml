@@ -16,7 +16,7 @@ services:
         target: /docker-entrypoint-initdb.d/
 
       # - type: volume
-      #   source: mydata
+      #   source: db-data
       #   target: /var/lib/postgresql/data
 
   db-client:
@@ -24,4 +24,4 @@ services:
     command: ["psql", "-h", "db", "-U", "postgres"]
 
 volumes:
-  mydata:
+  db-data:
